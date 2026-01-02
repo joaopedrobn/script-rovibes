@@ -18,7 +18,7 @@ getgenv().Settings = table.clear(getgenv().Settings or {})
 getgenv().Settings = {
     AutoFarm = false,
     TargetName = "LightTemplate",
-    TPDelay = 0.5,
+    TPDelay = 1.0,
     AutoServerHop = false,
     ESP_Enabled = false,
     ESP_Highlight = true,
@@ -687,11 +687,11 @@ local PageTroll = CreatePage("PageTroll")
 CreateTabBtn("Troll", PageTroll)
 
 local trollTarget = ""
-CreateInput(PageTroll, "Nome da Vítima (Stick)...", function(text)
+CreateInput(PageTroll, "Player (Grudar)...", function(text)
     trollTarget = text
 end)
 
-CreateToggle(PageTroll, "Grudar no Jogador (Stick)", function(val)
+CreateToggle(PageTroll, "Grudar", function(val)
     getgenv().Settings.StickTarget = val
     if val then
         task.spawn(function()
@@ -721,18 +721,6 @@ end, false)
 -- CONFIG
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
-
-CreateToggle(PageSettings, "Anti-Logs Voice (Limpeza)", function(val)
-    getgenv().Settings.AntiVoiceLogs = val
-    if val then
-        task.spawn(function()
-            while getgenv().Settings.AntiVoiceLogs do
-                LogService:ClearOutput()
-                task.wait(1)
-            end
-        end)
-    end
-end, false)
 
 CreateButton(PageSettings, "Fechar HUB", function()
     ScreenGui:Destroy()
