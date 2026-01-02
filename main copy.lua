@@ -6,17 +6,19 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local LogService = game:GetService("LogService")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 local ScriptURL = "https://raw.githubusercontent.com/joaopedrobn/script-rovibes/main/main.lua"
+local ConfigName = "JR_HUB_Config.json"
 
 getgenv().Settings = table.clear(getgenv().Settings or {})
 getgenv().Settings = {
     AutoFarm = false,
     TargetName = "LightTemplate",
-    TPDelay = 1,
+    TPDelay = 1.0,
     AutoServerHop = false,
     ESP_Enabled = false,
     ESP_Highlight = true,
@@ -29,9 +31,12 @@ getgenv().Settings = {
     FlySpeed = 50,
     SpinBot = false,
     WalkMode = false,
-    AntiVoiceLogs = false,
     StickTarget = false,
-    SpectateTarget = false
+    SpectateTarget = false,
+    Fullbright = false,
+    NoBlur = false,
+    CustomTime = false,
+    TimeValue = 14
 }
 
 getgenv().AutoFarm_Rejoined = nil
@@ -55,8 +60,8 @@ ScreenGui.Parent = CoreGui
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 550, 0, 350)
-MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
+MainFrame.Size = UDim2.new(0, 600, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
@@ -134,7 +139,7 @@ end)
 
 local Sidebar = Instance.new("Frame")
 Sidebar.Name = "Sidebar"
-Sidebar.Size = UDim2.new(0, 130, 1, -32)
+Sidebar.Size = UDim2.new(0, 140, 1, -32)
 Sidebar.Position = UDim2.new(0, 0, 0, 32)
 Sidebar.BackgroundColor3 = Theme.Sidebar
 Sidebar.BorderSizePixel = 0
@@ -173,8 +178,8 @@ UIListLayout.Parent = TabContainer
 
 local ContentArea = Instance.new("Frame")
 ContentArea.Name = "ContentArea"
-ContentArea.Size = UDim2.new(1, -140, 1, -52)
-ContentArea.Position = UDim2.new(0, 140, 0, 42)
+ContentArea.Size = UDim2.new(1, -150, 1, -52)
+ContentArea.Position = UDim2.new(0, 150, 0, 42)
 ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
@@ -318,6 +323,7 @@ local function CreateToggle(parent, text, callback, default)
         end
         callback(toggled)
     end)
+    return ToggleBtn
 end
 
 local function CreateSlider(parent, text, min, max, default, callback)
@@ -419,6 +425,22 @@ local function CreateButton(parent, text, callback)
     Btn.MouseButton1Click:Connect(callback)
 end
 
+local function CreateSection(parent, text)
+    local SectionLabel = Instance.new("TextLabel")
+    SectionLabel.Size = UDim2.new(1, 0, 0, 25)
+    SectionLabel.BackgroundTransparency = 1
+    SectionLabel.Text = text
+    SectionLabel.TextColor3 = Theme.Accent
+    SectionLabel.Font = Enum.Font.GothamBold
+    SectionLabel.TextSize = 16
+    SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+    SectionLabel.Parent = parent
+    
+    local Padding = Instance.new("UIPadding")
+    Padding.PaddingLeft = UDim.new(0, 10)
+    Padding.Parent = SectionLabel
+end
+
 local function CreateInput(parent, placeholder, callback)
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0.98, 0, 0, 40)
@@ -461,6 +483,17 @@ local function getTargets()
         end
     end
     return targets
+end
+
+local function getSortedTargets(term)
+    local t = {}
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        if v:IsA("Model") and (v.Name:find(term) or v.Name:lower():find(term:lower())) then
+            table.insert(t, v)
+        end
+    end
+    table.sort(t, function(a,b) return a.Name < b.Name end)
+    return t
 end
 
 local function toggleNoclip(state)
@@ -508,20 +541,44 @@ local function updateESP()
             end
             if getgenv().Settings.ESP_Names then
                 local bb = Instance.new("BillboardGui")
+                bb.Name = "Info"
                 bb.Adornee = plr.Character.Head
                 bb.Size = UDim2.new(0, 100, 0, 50)
                 bb.StudsOffset = Vector3.new(0, 2, 0)
                 bb.AlwaysOnTop = true
                 bb.Parent = ESP_Folder
-                local t = Instance.new("TextLabel")
-                t.Parent = bb
-                t.BackgroundTransparency = 1
-                t.Size = UDim2.new(1,0,1,0)
-                t.Text = plr.Name
-                t.TextColor3 = Color3.new(1,1,1)
-                t.TextStrokeTransparency = 0
-                t.Font = Enum.Font.GothamBold
-                t.TextSize = 14
+                
+                local name = Instance.new("TextLabel")
+                name.Parent = bb
+                name.BackgroundTransparency = 1
+                name.Position = UDim2.new(0, 0, 0, 0)
+                name.Size = UDim2.new(1, 0, 0.3, 0)
+                name.Text = plr.DisplayName
+                name.TextColor3 = Color3.new(1,1,1)
+                name.TextStrokeTransparency = 0
+                name.Font = Enum.Font.GothamBold
+                name.TextSize = 14
+                
+                local user = Instance.new("TextLabel")
+                user.Parent = bb
+                user.BackgroundTransparency = 1
+                user.Position = UDim2.new(0, 0, 0.3, 0)
+                user.Size = UDim2.new(1, 0, 0.3, 0)
+                user.Text = "@"..plr.Name
+                user.TextColor3 = Color3.fromRGB(200, 200, 200)
+                user.TextStrokeTransparency = 0
+                user.Font = Enum.Font.Gotham
+                user.TextSize = 12
+
+                task.spawn(function()
+                    local content = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+                    local icon = Instance.new("ImageLabel")
+                    icon.Parent = bb
+                    icon.BackgroundTransparency = 1
+                    icon.Position = UDim2.new(-0.3, 0, 0, 0)
+                    icon.Size = UDim2.new(0, 30, 0, 30)
+                    icon.Image = content
+                end)
             end
         end
     end
@@ -568,6 +625,24 @@ local function StartFarmLogic()
     end
 end
 
+local function SaveConfig()
+    if writefile then
+        local success, encoded = pcall(function() return HttpService:JSONEncode(getgenv().Settings) end)
+        if success then
+            writefile(ConfigName, encoded)
+        end
+    end
+end
+
+local function LoadConfig()
+    if isfile and isfile(ConfigName) then
+        local success, decoded = pcall(function() return HttpService:JSONDecode(readfile(ConfigName)) end)
+        if success then
+            getgenv().Settings = decoded
+        end
+    end
+end
+
 local PageFarm = CreatePage("PageFarm")
 CreateTabBtn("Farm", PageFarm)
 
@@ -580,7 +655,7 @@ CreateToggle(PageFarm, "Auto Server Hop", function(val)
     getgenv().Settings.AutoServerHop = val
 end, getgenv().Settings.AutoServerHop)
 
-CreateSlider(PageFarm, "Delay entre os TP's (Segundos)", 0, 2, 1, function(val)
+CreateSlider(PageFarm, "Delay entre os TP's (Segundos)", 0, 2, 1.0, function(val)
     getgenv().Settings.TPDelay = val
 end)
 
@@ -598,7 +673,7 @@ CreateToggle(PageVisuals, "Wall Bonecos", function(val)
     updateESP()
 end, true)
 
-CreateToggle(PageVisuals, "Wall Nomes", function(val)
+CreateToggle(PageVisuals, "Wall Nomes (Info)", function(val)
     getgenv().Settings.ESP_Names = val
     updateESP()
 end, true)
@@ -611,7 +686,7 @@ CreateInput(PageTeleport, "Player...", function(text)
     tpTarget = text
 end)
 
-CreateButton(PageTeleport, "Teleportar", function()
+CreateButton(PageTeleport, "Teleportar (Player)", function()
     local targetName = tpTarget:lower()
     local found = nil
     for _, v in ipairs(Players:GetPlayers()) do
@@ -620,13 +695,36 @@ CreateButton(PageTeleport, "Teleportar", function()
             break
         end
     end
-    
     if found and found.Character and found.Character:FindFirstChild("HumanoidRootPart") then
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = found.Character.HumanoidRootPart.CFrame
         end
     end
 end)
+
+CreateSection(PageTeleport, "BAÚS (CHESTS)")
+for i=1, 10 do
+    CreateButton(PageTeleport, "Baú "..i, function()
+        local list = getSortedTargets("Bau")
+        if #list == 0 then list = getSortedTargets("Chest") end
+        
+        if list[i] and LocalPlayer.Character then
+            LocalPlayer.Character:PivotTo(list[i]:GetPivot())
+        end
+    end)
+end
+
+CreateSection(PageTeleport, "OSSOS (BONES)")
+for i=1, 10 do
+    CreateButton(PageTeleport, "Osso "..i, function()
+        local list = getSortedTargets("Osso")
+        if #list == 0 then list = getSortedTargets("Bone") end
+        
+        if list[i] and LocalPlayer.Character then
+            LocalPlayer.Character:PivotTo(list[i]:GetPivot())
+        end
+    end)
+end
 
 local PageMove = CreatePage("PageMove")
 CreateTabBtn("Movimentação", PageMove)
@@ -674,7 +772,7 @@ CreateInput(PageTroll, "Player...", function(text)
     trollTarget = text
 end)
 
-CreateToggle(PageTroll, "Grudar", function(val)
+CreateToggle(PageTroll, "Grudar (Stick)", function(val)
     getgenv().Settings.StickTarget = val
     if val then
         task.spawn(function()
@@ -699,7 +797,7 @@ CreateToggle(PageTroll, "Grudar", function(val)
     end
 end, false)
 
-CreateToggle(PageTroll, "Assistir", function(val)
+CreateToggle(PageTroll, "Assistir (Spectate)", function(val)
     getgenv().Settings.SpectateTarget = val
     if val then
         task.spawn(function()
@@ -728,14 +826,59 @@ CreateToggle(PageTroll, "Assistir", function(val)
     end
 end, false)
 
+local PageGraphics = CreatePage("PageGraphics")
+CreateTabBtn("Gráficos", PageGraphics)
+
+CreateToggle(PageGraphics, "Fullbright (Luz Infinita)", function(val)
+    getgenv().Settings.Fullbright = val
+    if val then
+        task.spawn(function()
+            while getgenv().Settings.Fullbright do
+                Lighting.Brightness = 2
+                Lighting.ClockTime = 14
+                Lighting.FogEnd = 100000
+                Lighting.GlobalShadows = false
+                Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+                task.wait(1)
+            end
+        end)
+    end
+end, false)
+
+CreateToggle(PageGraphics, "Remover Blur/Efeitos", function(val)
+    getgenv().Settings.NoBlur = val
+    if val then
+        for _, v in pairs(Lighting:GetChildren()) do
+            if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+                v.Enabled = false
+            end
+        end
+    end
+end, false)
+
+CreateSlider(PageGraphics, "Horário (Hora)", 0, 24, 14, function(val)
+    Lighting.ClockTime = val
+end)
+
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
+
+CreateButton(PageSettings, "Salvar Config", function()
+    SaveConfig()
+end)
+
+CreateButton(PageSettings, "Carregar Config", function()
+    LoadConfig()
+end)
+
+CreateButton(PageSettings, "Rejoin Server (Reentrar)", function()
+    TeleportService:Teleport(game.PlaceId, LocalPlayer)
+end)
 
 CreateButton(PageSettings, "Fechar HUB", function()
     ScreenGui:Destroy()
     ESP_Folder:Destroy()
     getgenv().Settings.AutoFarm = false
-    getgenv().Settings.AntiVoiceLogs = false
     getgenv().Settings.StickTarget = false
     getgenv().Settings.SpectateTarget = false
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
