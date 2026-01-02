@@ -9,10 +9,12 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
---// LINK DO SCRIPT (Para reinjeção)
+--// URL DO SCRIPT (IMPORTANTE: MANTENHA O ARQUIVO DO GITHUB ATUALIZADO COM ESSE CÓDIGO)
 local ScriptURL = "https://raw.githubusercontent.com/joaopedrobn/script-rovibes/main/main.lua"
 
---// 1. CONFIGURAÇÕES (Iniciam sempre como FALSE)
+--// 1. HARD RESET NAS CONFIGURAÇÕES
+-- Isso garante que, mesmo que o executor tente salvar o estado anterior, nós forçamos tudo para FALSE.
+getgenv().Settings = table.clear(getgenv().Settings or {})
 getgenv().Settings = {
     AutoFarm = false,
     TargetName = "LightTemplate",
@@ -30,6 +32,9 @@ getgenv().Settings = {
     SpinBot = false,
     WalkMode = false
 }
+
+-- Forçar limpeza de flags antigas que possam estar na memória do executor
+getgenv().AutoFarm_Rejoined = nil
 
 local Theme = {
     Background = Color3.fromRGB(20, 20, 20),
@@ -84,7 +89,7 @@ TitleBarFiller.BackgroundColor3 = Theme.Accent
 TitleBarFiller.BorderSizePixel = 0
 TitleBarFiller.Parent = TitleBar
 
--- Frame Minimized
+-- Frame Minimized (Botão flutuante)
 local MiniFrame = Instance.new("TextButton")
 MiniFrame.Name = "MiniFrame"
 MiniFrame.Size = UDim2.new(0, 150, 0, 30)
@@ -179,7 +184,7 @@ ContentArea.Position = UDim2.new(0, 140, 0, 42)
 ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
--- Window Controls
+-- Window Controls (Botão de Minimizar na barra vermelha)
 local WindowControls = Instance.new("Frame")
 WindowControls.Name = "WindowControls"
 WindowControls.Size = UDim2.new(0, 40, 1, 0)
