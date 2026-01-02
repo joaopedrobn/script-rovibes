@@ -149,7 +149,7 @@ task.spawn(function()
     end
 end)
 
-local tpInput = Instance.new("NomePlayer", MainFrame)
+local tpInput = Instance.new("TextBox", MainFrame)
 tpInput.Size = UDim2.new(0.9, 0, 0, 35)
 tpInput.PlaceholderText = "Nome do Player (Parcial)"
 tpInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
