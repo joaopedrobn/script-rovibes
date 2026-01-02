@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService")
 local LogService = game:GetService("LogService")
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
+local VirtualUser = game:GetService("VirtualUser")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
@@ -36,12 +37,14 @@ getgenv().Settings = {
     StickTarget = false,
     SpectateTarget = false,
     Fullbright = false,
-    NoBlur = false
+    NoBlur = false,
+    AntiAFK = false
 }
 
 getgenv().AutoFarm_Rejoined = nil
 getgenv().ChestIndex = 1
 getgenv().BoneIndex = 1
+getgenv().AntiAFKConnection = nil
 
 local Theme = {
     Background = Color3.fromRGB(20, 20, 20),
@@ -730,17 +733,35 @@ CreateButton(PageTeleport, "Ir para Próximo Osso (Bone)", function()
 end)
 
 CreateButton(PageTeleport, "Sacrifício (Altar)", function() 
-    if not TPToName("Altar") then TPToName("Sacrif") end 
+    if LocalPlayer.Character then
+        LocalPlayer.Character:PivotTo(CFrame.new(465, 16, 491))
+    end
 end)
+
 CreateButton(PageTeleport, "Ponte (Bridge)", function() 
-    if not TPToName("Bridge") then TPToName("Ponte") end 
+    if LocalPlayer.Character then
+        LocalPlayer.Character:PivotTo(CFrame.new(103, 4, 802))
+    end
 end)
-CreateButton(PageTeleport, "Ilha (Island)", function() 
-    if not TPToName("Island") then TPToName("Ilha") end 
+
+CreateButton(PageTeleport, "Farol 1 (Snow)", function() 
+    if LocalPlayer.Character then
+        LocalPlayer.Character:PivotTo(CFrame.new(113, 82, 292))
+    end
 end)
-CreateButton(PageTeleport, "Neve (Snow)", function() 
-    if not TPToName("Snow") then TPToName("Neve") end 
+
+CreateButton(PageTeleport, "Farol 2 (Lighthouse)", function() 
+    if LocalPlayer.Character then
+        LocalPlayer.Character:PivotTo(CFrame.new(-277, 81, -240))
+    end
 end)
+
+CreateButton(PageTeleport, "Casinha Biscoito", function() 
+    if LocalPlayer.Character then
+        LocalPlayer.Character:PivotTo(CFrame.new(100, 2, 377))
+    end
+end)
+
 CreateButton(PageTeleport, "Céu (Sky)", function() 
     if LocalPlayer.Character then 
         LocalPlayer.Character:PivotTo(CFrame.new(0, 500, 0)) 
@@ -913,6 +934,23 @@ end)
 
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
+
+CreateToggle(PageSettings, "Anti-AFK (No Kick)", function(val)
+    getgenv().Settings.AntiAFK = val
+    if val then
+        local VirtualUser = game:GetService("VirtualUser")
+        local con = LocalPlayer.Idled:Connect(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+        end)
+        getgenv().AntiAFKConnection = con
+    else
+        if getgenv().AntiAFKConnection then
+            getgenv().AntiAFKConnection:Disconnect()
+            getgenv().AntiAFKConnection = nil
+        end
+    end
+end, false)
 
 CreateButton(PageSettings, "Salvar Config", function()
     SaveConfig()
