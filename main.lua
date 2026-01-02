@@ -9,8 +9,10 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
-local ScriptURL = "https://raw.githubusercontent.com/joaopedrobn/script-rovibes/refs/heads/main/main.lua"
+--// LINK CORRIGIDO (SEM 'refs/heads')
+local ScriptURL = "https://raw.githubusercontent.com/joaopedrobn/script-rovibes/main/main.lua"
 
+--// 1. CONFIGURAÇÕES
 getgenv().Settings = {
     AutoFarm = false,
     TargetName = "LightTemplate",
@@ -29,6 +31,7 @@ getgenv().Settings = {
     WalkMode = false
 }
 
+-- SE RECONECTOU AUTOMATICAMENTE, ATIVA O FARM
 if getgenv().AutoFarm_Rejoined then
     getgenv().Settings.AutoFarm = true
     getgenv().Settings.AutoServerHop = true
@@ -37,12 +40,13 @@ end
 local Theme = {
     Background = Color3.fromRGB(20, 20, 20),
     Sidebar = Color3.fromRGB(30, 30, 30),
-    Accent = Color3.fromRGB(255, 60, 60),
+    Accent = Color3.fromRGB(255, 60, 60), -- Vermelho
     Text = Color3.fromRGB(255, 255, 255),
     TextDim = Color3.fromRGB(150, 150, 150),
     ControlHover = Color3.fromRGB(50, 50, 50)
 }
 
+--// 3. UI SETUP
 if CoreGui:FindFirstChild("JR_HUB") then CoreGui.JR_HUB:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -51,6 +55,7 @@ ScreenGui.ResetOnSpawn = false
 if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end
 ScreenGui.Parent = CoreGui
 
+-- MainFrame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 550, 0, 350)
@@ -58,13 +63,14 @@ MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
-MainFrame.Draggable = true
+MainFrame.Draggable = true 
 MainFrame.Parent = ScreenGui
 
 local Corner = Instance.new("UICorner")
 Corner.CornerRadius = UDim.new(0, 8)
 Corner.Parent = MainFrame
 
+-- --- BARRA DE TÍTULO ---
 local TitleBar = Instance.new("Frame")
 TitleBar.Name = "TitleBar"
 TitleBar.Size = UDim2.new(1, 0, 0, 32)
@@ -84,6 +90,7 @@ TitleBarFiller.BackgroundColor3 = Theme.Accent
 TitleBarFiller.BorderSizePixel = 0
 TitleBarFiller.Parent = TitleBar
 
+-- Frame Minimized (Botão flutuante)
 local MiniFrame = Instance.new("TextButton")
 MiniFrame.Name = "MiniFrame"
 MiniFrame.Size = UDim2.new(0, 150, 0, 30)
@@ -130,9 +137,10 @@ MiniFrame.MouseButton1Click:Connect(function()
     MainFrame.Visible = true
 end)
 
+-- Sidebar
 local Sidebar = Instance.new("Frame")
 Sidebar.Name = "Sidebar"
-Sidebar.Size = UDim2.new(0, 130, 1, -32)
+Sidebar.Size = UDim2.new(0, 130, 1, -32) 
 Sidebar.Position = UDim2.new(0, 0, 0, 32)
 Sidebar.BackgroundColor3 = Theme.Sidebar
 Sidebar.BorderSizePixel = 0
@@ -169,6 +177,7 @@ UIListLayout.Padding = UDim.new(0, 5)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout.Parent = TabContainer
 
+-- Content Area
 local ContentArea = Instance.new("Frame")
 ContentArea.Name = "ContentArea"
 ContentArea.Size = UDim2.new(1, -140, 1, -52)
@@ -176,6 +185,7 @@ ContentArea.Position = UDim2.new(0, 140, 0, 42)
 ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
+-- Botão de Minimizar (Dentro da Barra de Título)
 local WindowControls = Instance.new("Frame")
 WindowControls.Name = "WindowControls"
 WindowControls.Size = UDim2.new(0, 40, 1, 0)
@@ -212,6 +222,7 @@ local Pages = Instance.new("Folder")
 Pages.Name = "Pages"
 Pages.Parent = ContentArea
 
+--// FUNÇÕES UI HELPERS
 local currentTab = nil
 
 local function CreatePage(name)
@@ -298,7 +309,6 @@ local function CreateToggle(parent, text, callback, default)
     ToggleBtn.Size = UDim2.new(0, 24, 0, 24)
     ToggleBtn.Position = UDim2.new(0.9, -24, 0.5, -12)
     ToggleBtn.Text = ""
-    -- Define cor inicial baseado no default
     ToggleBtn.BackgroundColor3 = default and Theme.Accent or Color3.fromRGB(60, 60, 60)
     ToggleBtn.Parent = Frame
     
@@ -446,6 +456,7 @@ local function CreateInput(parent, placeholder, callback)
     end)
 end
 
+--// 5. LÓGICA DO SCRIPT
 local Connections = {}
 local ESP_Folder = Instance.new("Folder", CoreGui)
 ESP_Folder.Name = "ESP_Cache"
@@ -542,6 +553,7 @@ local function StartFarmLogic()
                 if #lights == 0 and getgenv().Settings.AutoServerHop then
                     if queue_on_teleport then
                         queue_on_teleport([[
+                            task.wait(2)
                             getgenv().AutoFarm_Rejoined = true
                             loadstring(game:HttpGet("]] .. ScriptURL .. [["))()
                         ]])
@@ -567,6 +579,9 @@ local function StartFarmLogic()
     end
 end
 
+--// 6. PÁGINAS
+
+-- FARM
 local PageFarm = CreatePage("PageFarm")
 CreateTabBtn("Farm", PageFarm)
 
@@ -583,6 +598,7 @@ CreateSlider(PageFarm, "Delay TP (Segundos)", 0, 2, 0.5, function(val)
     getgenv().Settings.TPDelay = val
 end)
 
+-- VISUALS
 local PageVisuals = CreatePage("PageVisuals")
 CreateTabBtn("Visual", PageVisuals)
 
@@ -602,6 +618,7 @@ CreateToggle(PageVisuals, "ESP Nomes", function(val)
     updateESP()
 end, true)
 
+-- TELEPORT
 local PageTeleport = CreatePage("PageTeleport")
 CreateTabBtn("Teleport", PageTeleport)
 
@@ -627,6 +644,7 @@ CreateButton(PageTeleport, "TELEPORTAR", function()
     end
 end)
 
+-- MOVEMENT
 local PageMove = CreatePage("PageMove")
 CreateTabBtn("Movimentação", PageMove)
 
@@ -665,6 +683,7 @@ CreateSlider(PageMove, "Força do Pulo", 50, 500, 50, function(val)
     getgenv().Settings.JumpPower = val
 end)
 
+-- CONFIG
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
 
