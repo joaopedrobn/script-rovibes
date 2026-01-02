@@ -24,6 +24,7 @@ getgenv().Settings = {
     ESP_Enabled = false,
     ESP_Highlight = true,
     ESP_Names = true,
+    ESP_Face = true,
     WalkSpeed = 16,
     JumpPower = 50,
     SpeedEnabled = false,
@@ -35,9 +36,7 @@ getgenv().Settings = {
     StickTarget = false,
     SpectateTarget = false,
     Fullbright = false,
-    NoBlur = false,
-    CustomTime = false,
-    TimeValue = 14
+    NoBlur = false
 }
 
 getgenv().AutoFarm_Rejoined = nil
@@ -428,22 +427,6 @@ local function CreateButton(parent, text, callback)
     Btn.MouseButton1Click:Connect(callback)
 end
 
-local function CreateSection(parent, text)
-    local SectionLabel = Instance.new("TextLabel")
-    SectionLabel.Size = UDim2.new(1, 0, 0, 25)
-    SectionLabel.BackgroundTransparency = 1
-    SectionLabel.Text = text
-    SectionLabel.TextColor3 = Theme.Accent
-    SectionLabel.Font = Enum.Font.GothamBold
-    SectionLabel.TextSize = 16
-    SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
-    SectionLabel.Parent = parent
-    
-    local Padding = Instance.new("UIPadding")
-    Padding.PaddingLeft = UDim.new(0, 10)
-    Padding.Parent = SectionLabel
-end
-
 local function CreateInput(parent, placeholder, callback)
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0.98, 0, 0, 40)
@@ -724,7 +707,6 @@ CreateButton(PageTeleport, "Teleportar (Player)", function()
     end
 end)
 
-CreateSection(PageTeleport, "LOJA/ITENS (Sequencial)")
 CreateButton(PageTeleport, "Ir para Próximo Baú (Chest)", function()
     local list = getSortedTargets("Bau", "Chest")
     if #list > 0 then
@@ -747,7 +729,6 @@ CreateButton(PageTeleport, "Ir para Próximo Osso (Bone)", function()
     end
 end)
 
-CreateSection(PageTeleport, "LOCAIS (FIXOS)")
 CreateButton(PageTeleport, "Sacrifício (Altar)", function() 
     if not TPToName("Altar") then TPToName("Sacrif") end 
 end)
@@ -957,6 +938,7 @@ CreateButton(PageSettings, "Fechar HUB", function()
     getgenv().Settings.AutoFarm = false
     getgenv().Settings.StickTarget = false
     getgenv().Settings.SpectateTarget = false
+    getgenv().Settings.Fullbright = false
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         Camera.CameraSubject = LocalPlayer.Character.Humanoid
     end
