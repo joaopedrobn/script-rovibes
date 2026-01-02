@@ -1,12 +1,88 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+--// 1. SISTEMA DE MINIMIZAR (CUSTOM UI)
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+-- Criar a GUI do Botão Minimizado
+local MiniGui = Instance.new("ScreenGui")
+MiniGui.Name = "MiniHub_Button"
+MiniGui.Parent = CoreGui
+MiniGui.Enabled = false -- Começa invisível
+
+local MaximizeBtn = Instance.new("TextButton")
+MaximizeBtn.Name = "MaximizeBtn"
+MaximizeBtn.Parent = MiniGui
+MaximizeBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MaximizeBtn.BorderSizePixel = 0
+MaximizeBtn.Position = UDim2.new(0.01, 0, 0.5, 0) -- Posição inicial (Esquerda meio)
+MaximizeBtn.Size = UDim2.new(0, 120, 0, 40)
+MaximizeBtn.Text = "ABRIR HUB"
+MaximizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MaximizeBtn.Font = Enum.Font.GothamBold
+MaximizeBtn.TextSize = 12
+
+-- Borda Bonita (Stroke)
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Parent = MaximizeBtn
+UIStroke.Color = Color3.fromRGB(60, 60, 60)
+UIStroke.Thickness = 1
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Arredondamento
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 6)
+UICorner.Parent = MaximizeBtn
+
+-- Tornar o botão arrastável (Draggable Logic)
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    MaximizeBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MaximizeBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MaximizeBtn.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MaximizeBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+-- Lógica de Maximizar (Clicar no botão pequeno)
+MaximizeBtn.MouseButton1Click:Connect(function()
+    MiniGui.Enabled = false
+    -- Tenta encontrar a GUI do Orion e mostrar
+    if OrionLib.Instance then
+        OrionLib.Instance.Enabled = true
+    end
+end)
+
+--// 2. INÍCIO DO ORION LIB
 local Window = OrionLib:MakeWindow({Name = "HUB - by jr", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest", IntroEnabled = true})
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local Workspace = game:GetService("Workspace")
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -387,10 +463,29 @@ MovementTab:AddToggle({
     end    
 })
 
+--// 3. BOTÃO DE MINIMIZAR NA UI
+SettingsTab:AddButton({
+    Name = "Minimizar Janela",
+    Callback = function()
+        -- Esconde o Orion
+        OrionLib.Instance.Enabled = false
+        -- Mostra o botãozinho
+        MiniGui.Enabled = true
+        
+        OrionLib:MakeNotification({
+            Name = "Minimizado",
+            Content = "O Hub foi minimizado. Clique no botão pequeno para abrir.",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+    end    
+})
+
 SettingsTab:AddButton({
     Name = "Unload GUI",
     Callback = function()
         OrionLib:Destroy()
+        MiniGui:Destroy() -- Destrói o botão minimizado também
         ESP_Folder:Destroy()
         getgenv().Settings.AutoFarm = false
         toggleNoclip(false)
