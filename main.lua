@@ -580,7 +580,7 @@ CreateToggle(PageFarm, "Auto Server Hop", function(val)
     getgenv().Settings.AutoServerHop = val
 end, getgenv().Settings.AutoServerHop)
 
-CreateSlider(PageFarm, "Delay entre os TP's (Segundos)", 0, 2, 0.5, function(val)
+CreateSlider(PageFarm, "Delay entre os TP's (Segundos)", 0.5, 1, 2, function(val)
     getgenv().Settings.TPDelay = val
 end)
 
