@@ -17,10 +17,10 @@ getgenv().Settings = {
 
 local Connections = {}
 local ESP_Folder = Instance.new("Folder", CoreGui)
-ESP_Folder.Name = "Flickz_ESP_Storage"
+ESP_Folder.Name = "ESP_Storage"
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "FlickzHub"
+ScreenGui.Name = "Hub"
 ScreenGui.ResetOnSpawn = false
 if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end 
 ScreenGui.Parent = CoreGui
@@ -36,7 +36,7 @@ MainFrame.Draggable = true
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Title.Text = "FLICKZ HUB v2 - DEV: JOÃO"
+Title.Text = "HUB - by jr"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 14
@@ -257,4 +257,4 @@ createButton("Destruir GUI", function()
     toggleNoclip(false)
 end)
 
-print("FLICKZ HUB v2 CARREGADO COM SUCESSO")
+print("HUB CARREGADO COM SUCESSO")
