@@ -9,8 +9,7 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
-local ScriptURL = "https://raw.githubusercontent.com/joaopedrobn/script-rovibes/refs/heads/main/main.lua"
-
+--// 1. CONFIGURAÇÕES
 getgenv().Settings = {
     AutoFarm = false,
     TargetName = "LightTemplate",
@@ -29,20 +28,17 @@ getgenv().Settings = {
     WalkMode = false
 }
 
-if getgenv().AutoFarm_Rejoined then
-    getgenv().Settings.AutoFarm = true
-    getgenv().Settings.AutoServerHop = true
-end
-
+--// 2. TEMA
 local Theme = {
     Background = Color3.fromRGB(20, 20, 20),
     Sidebar = Color3.fromRGB(30, 30, 30),
-    Accent = Color3.fromRGB(255, 60, 60),
+    Accent = Color3.fromRGB(255, 60, 60), -- Vermelho
     Text = Color3.fromRGB(255, 255, 255),
     TextDim = Color3.fromRGB(150, 150, 150),
     ControlHover = Color3.fromRGB(50, 50, 50)
 }
 
+--// 3. UI SETUP
 if CoreGui:FindFirstChild("JR_HUB") then CoreGui.JR_HUB:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -51,6 +47,7 @@ ScreenGui.ResetOnSpawn = false
 if syn and syn.protect_gui then syn.protect_gui(ScreenGui) end
 ScreenGui.Parent = CoreGui
 
+-- MainFrame (Corpo da Janela)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 550, 0, 350)
@@ -58,16 +55,17 @@ MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
 MainFrame.BackgroundColor3 = Theme.Background
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
-MainFrame.Draggable = true
+MainFrame.Draggable = true -- Permite arrastar a janela
 MainFrame.Parent = ScreenGui
 
 local Corner = Instance.new("UICorner")
 Corner.CornerRadius = UDim.new(0, 8)
 Corner.Parent = MainFrame
 
+-- --- BARRA DE TÍTULO (NOVO) ---
 local TitleBar = Instance.new("Frame")
 TitleBar.Name = "TitleBar"
-TitleBar.Size = UDim2.new(1, 0, 0, 32)
+TitleBar.Size = UDim2.new(1, 0, 0, 32) -- Altura da barra
 TitleBar.BackgroundColor3 = Theme.Accent
 TitleBar.BorderSizePixel = 0
 TitleBar.Parent = MainFrame
@@ -76,6 +74,7 @@ local TitleBarCorner = Instance.new("UICorner")
 TitleBarCorner.CornerRadius = UDim.new(0, 8)
 TitleBarCorner.Parent = TitleBar
 
+-- Preenchimento para "quadrar" a parte de baixo da barra de título
 local TitleBarFiller = Instance.new("Frame")
 TitleBarFiller.Name = "Filler"
 TitleBarFiller.Size = UDim2.new(1, 0, 0, 10)
@@ -83,7 +82,9 @@ TitleBarFiller.Position = UDim2.new(0, 0, 1, -10)
 TitleBarFiller.BackgroundColor3 = Theme.Accent
 TitleBarFiller.BorderSizePixel = 0
 TitleBarFiller.Parent = TitleBar
+-- ------------------------------
 
+-- Frame Minimizado
 local MiniFrame = Instance.new("TextButton")
 MiniFrame.Name = "MiniFrame"
 MiniFrame.Size = UDim2.new(0, 150, 0, 30)
@@ -130,10 +131,11 @@ MiniFrame.MouseButton1Click:Connect(function()
     MainFrame.Visible = true
 end)
 
+-- Sidebar (Ajustada para baixo)
 local Sidebar = Instance.new("Frame")
 Sidebar.Name = "Sidebar"
-Sidebar.Size = UDim2.new(0, 130, 1, -32)
-Sidebar.Position = UDim2.new(0, 0, 0, 32)
+Sidebar.Size = UDim2.new(0, 130, 1, -32) -- Altura total menos a barra de título
+Sidebar.Position = UDim2.new(0, 0, 0, 32) -- Move para baixo
 Sidebar.BackgroundColor3 = Theme.Sidebar
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = MainFrame
@@ -169,19 +171,21 @@ UIListLayout.Padding = UDim.new(0, 5)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout.Parent = TabContainer
 
+-- Content Area (Ajustada para baixo)
 local ContentArea = Instance.new("Frame")
 ContentArea.Name = "ContentArea"
-ContentArea.Size = UDim2.new(1, -140, 1, -52)
-ContentArea.Position = UDim2.new(0, 140, 0, 42)
+ContentArea.Size = UDim2.new(1, -140, 1, -52) -- Ajuste de altura
+ContentArea.Position = UDim2.new(0, 140, 0, 42) -- Ajuste de posição
 ContentArea.BackgroundTransparency = 1
 ContentArea.Parent = MainFrame
 
+-- Botão de Minimizar (Dentro da Barra de Título)
 local WindowControls = Instance.new("Frame")
 WindowControls.Name = "WindowControls"
 WindowControls.Size = UDim2.new(0, 40, 1, 0)
 WindowControls.Position = UDim2.new(1, -40, 0, 0)
 WindowControls.BackgroundTransparency = 1
-WindowControls.Parent = TitleBar
+WindowControls.Parent = TitleBar -- Parenteado na Barra de Título
 
 local MinBtn = Instance.new("TextButton")
 MinBtn.Name = "MinBtn"
@@ -190,11 +194,12 @@ MinBtn.BackgroundColor3 = Theme.Accent
 MinBtn.BackgroundTransparency = 0
 MinBtn.BorderSizePixel = 0
 MinBtn.Text = "-"
-MinBtn.TextColor3 = Theme.Text
+MinBtn.TextColor3 = Theme.Text -- Texto branco
 MinBtn.Font = Enum.Font.Gotham
 MinBtn.TextSize = 24
 MinBtn.Parent = WindowControls
 
+-- Efeito de hover no botão de minimizar
 MinBtn.MouseEnter:Connect(function()
     TweenService:Create(MinBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
 end)
@@ -212,6 +217,7 @@ local Pages = Instance.new("Folder")
 Pages.Name = "Pages"
 Pages.Parent = ContentArea
 
+--// 4. FUNÇÕES UI HELPERS
 local currentTab = nil
 
 local function CreatePage(name)
@@ -298,7 +304,6 @@ local function CreateToggle(parent, text, callback, default)
     ToggleBtn.Size = UDim2.new(0, 24, 0, 24)
     ToggleBtn.Position = UDim2.new(0.9, -24, 0.5, -12)
     ToggleBtn.Text = ""
-    -- Define cor inicial baseado no default
     ToggleBtn.BackgroundColor3 = default and Theme.Accent or Color3.fromRGB(60, 60, 60)
     ToggleBtn.Parent = Frame
     
@@ -446,6 +451,7 @@ local function CreateInput(parent, placeholder, callback)
     end)
 end
 
+--// 5. LÓGICA DO SCRIPT
 local Connections = {}
 local ESP_Folder = Instance.new("Folder", CoreGui)
 ESP_Folder.Name = "ESP_Cache"
@@ -533,19 +539,20 @@ task.spawn(function()
     end
 end)
 
-local function StartFarmLogic()
-    if getgenv().Settings.AutoFarm then
+--// 6. PÁGINAS
+
+-- FARM
+local PageFarm = CreatePage("PageFarm")
+CreateTabBtn("Farm", PageFarm)
+
+CreateToggle(PageFarm, "Auto Farm Light", function(val)
+    getgenv().Settings.AutoFarm = val
+    if val then
         toggleNoclip(true)
         task.spawn(function()
             while getgenv().Settings.AutoFarm do
                 local lights = getTargets()
                 if #lights == 0 and getgenv().Settings.AutoServerHop then
-                    if queue_on_teleport then
-                        queue_on_teleport([[
-                            getgenv().AutoFarm_Rejoined = true
-                            loadstring(game:HttpGet("]] .. ScriptURL .. [["))()
-                        ]])
-                    end
                     TeleportService:Teleport(game.PlaceId, LocalPlayer)
                     break
                 end
@@ -565,24 +572,17 @@ local function StartFarmLogic()
     else
         toggleNoclip(false)
     end
-end
-
-local PageFarm = CreatePage("PageFarm")
-CreateTabBtn("Farm", PageFarm)
-
-CreateToggle(PageFarm, "Auto Farm Light", function(val)
-    getgenv().Settings.AutoFarm = val
-    StartFarmLogic()
-end, getgenv().Settings.AutoFarm)
+end, false)
 
 CreateToggle(PageFarm, "Auto Server Hop", function(val)
     getgenv().Settings.AutoServerHop = val
-end, getgenv().Settings.AutoServerHop)
+end, false)
 
 CreateSlider(PageFarm, "Delay TP (Segundos)", 0, 2, 0.5, function(val)
     getgenv().Settings.TPDelay = val
 end)
 
+-- VISUALS
 local PageVisuals = CreatePage("PageVisuals")
 CreateTabBtn("Visual", PageVisuals)
 
@@ -602,6 +602,7 @@ CreateToggle(PageVisuals, "ESP Nomes", function(val)
     updateESP()
 end, true)
 
+-- TELEPORT
 local PageTeleport = CreatePage("PageTeleport")
 CreateTabBtn("Teleport", PageTeleport)
 
@@ -627,6 +628,7 @@ CreateButton(PageTeleport, "TELEPORTAR", function()
     end
 end)
 
+-- MOVEMENT
 local PageMove = CreatePage("PageMove")
 CreateTabBtn("Movimentação", PageMove)
 
@@ -665,6 +667,7 @@ CreateSlider(PageMove, "Força do Pulo", 50, 500, 50, function(val)
     getgenv().Settings.JumpPower = val
 end)
 
+-- CONFIG
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
 
@@ -683,9 +686,5 @@ Credits.Font = Enum.Font.Gotham
 Credits.Size = UDim2.new(1, 0, 0, 20)
 Credits.Position = UDim2.new(0, 0, 1, -25)
 Credits.Parent = PageSettings
-
-if getgenv().Settings.AutoFarm then
-    StartFarmLogic()
-end
 
 print("HUB CARREGADO")
