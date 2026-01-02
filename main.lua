@@ -583,7 +583,7 @@ end
 local PageFarm = CreatePage("PageFarm")
 CreateTabBtn("Farm", PageFarm)
 
-CreateToggle(PageFarm, "Auto Farm Light", function(val)
+CreateToggle(PageFarm, "Auto Farm Light (Evento)", function(val)
     getgenv().Settings.AutoFarm = val
     StartFarmLogic()
 end, getgenv().Settings.AutoFarm)
@@ -592,7 +592,7 @@ CreateToggle(PageFarm, "Auto Server Hop", function(val)
     getgenv().Settings.AutoServerHop = val
 end, getgenv().Settings.AutoServerHop)
 
-CreateSlider(PageFarm, "Delay TP (Segundos)", 0, 2, 0.5, function(val)
+CreateSlider(PageFarm, "Delay entre os TP's (Segundos)", 0, 2, 0.5, function(val)
     getgenv().Settings.TPDelay = val
 end)
 
@@ -600,32 +600,32 @@ end)
 local PageVisuals = CreatePage("PageVisuals")
 CreateTabBtn("Visual", PageVisuals)
 
-CreateToggle(PageVisuals, "Ativar ESP", function(val)
+CreateToggle(PageVisuals, "Ativar Wall", function(val)
     getgenv().Settings.ESP_Enabled = val
     if not val then ESP_Folder:ClearAllChildren() end
     updateESP()
 end, false)
 
-CreateToggle(PageVisuals, "ESP Body", function(val)
+CreateToggle(PageVisuals, "Wall Bonecos", function(val)
     getgenv().Settings.ESP_Highlight = val
     updateESP()
 end, true)
 
-CreateToggle(PageVisuals, "ESP Nomes", function(val)
+CreateToggle(PageVisuals, "Wall Nomes", function(val)
     getgenv().Settings.ESP_Names = val
     updateESP()
 end, true)
 
 -- TELEPORT
 local PageTeleport = CreatePage("PageTeleport")
-CreateTabBtn("Teleport", PageTeleport)
+CreateTabBtn("Teleporte", PageTeleport)
 
 local tpTarget = ""
 CreateInput(PageTeleport, "Nome do Jogador...", function(text)
     tpTarget = text
 end)
 
-CreateButton(PageTeleport, "TELEPORTAR", function()
+CreateButton(PageTeleport, "Teleportar", function()
     local targetName = tpTarget:lower()
     local found = nil
     for _, v in ipairs(Players:GetPlayers()) do
@@ -677,7 +677,7 @@ CreateToggle(PageMove, "Super Pulo", function(val)
     end)
 end, false)
 
-CreateSlider(PageMove, "Força do Pulo", 50, 500, 50, function(val)
+CreateSlider(PageMove, "Altura", 50, 500, 50, function(val)
     getgenv().Settings.JumpPower = val
 end)
 
@@ -685,7 +685,7 @@ end)
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
 
-CreateButton(PageSettings, "DESTRUIR GUI (Fechar)", function()
+CreateButton(PageSettings, "Fechar HUB", function()
     ScreenGui:Destroy()
     ESP_Folder:Destroy()
     getgenv().Settings.AutoFarm = false
