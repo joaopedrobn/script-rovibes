@@ -665,23 +665,23 @@ end)
 local PageVisuals = CreatePage("PageVisuals")
 CreateTabBtn("Visual", PageVisuals)
 
-CreateToggle(PageVisuals, "Ativar Wall (Master)", function(val)
+CreateToggle(PageVisuals, "Ativar Wall (Principal)", function(val)
     getgenv().Settings.ESP_Enabled = val
     if not val then ESP_Folder:ClearAllChildren() end
     updateESP()
 end, false)
 
-CreateToggle(PageVisuals, "Wall Bonecos (Highlight)", function(val)
+CreateToggle(PageVisuals, "Wall Bonecos", function(val)
     getgenv().Settings.ESP_Highlight = val
     updateESP()
 end, true)
 
-CreateToggle(PageVisuals, "Wall Nomes (Texto)", function(val)
+CreateToggle(PageVisuals, "Wall Nomes", function(val)
     getgenv().Settings.ESP_Names = val
     updateESP()
 end, true)
 
-CreateToggle(PageVisuals, "Wall Ícone (Foto)", function(val)
+CreateToggle(PageVisuals, "Wall Ícones", function(val)
     getgenv().Settings.ESP_Face = val
     updateESP()
 end, true)
@@ -710,7 +710,7 @@ CreateButton(PageTeleport, "Teleportar (Player)", function()
     end
 end)
 
-CreateButton(PageTeleport, "Ir para Próximo Baú (Chest)", function()
+CreateButton(PageTeleport, "Ir para Próximo Baú", function()
     local list = getSortedTargets("Bau", "Chest")
     if #list > 0 then
         if getgenv().ChestIndex > #list then getgenv().ChestIndex = 1 end
@@ -721,7 +721,7 @@ CreateButton(PageTeleport, "Ir para Próximo Baú (Chest)", function()
     end
 end)
 
-CreateButton(PageTeleport, "Ir para Próximo Osso (Bone)", function()
+CreateButton(PageTeleport, "Ir para Próximo Osso", function()
     local list = getSortedTargets("Osso", "Bone")
     if #list > 0 then
         if getgenv().BoneIndex > #list then getgenv().BoneIndex = 1 end
@@ -732,37 +732,37 @@ CreateButton(PageTeleport, "Ir para Próximo Osso (Bone)", function()
     end
 end)
 
-CreateButton(PageTeleport, "Sacrifício (Altar)", function() 
+CreateButton(PageTeleport, "Sacrifício", function() 
     if LocalPlayer.Character then
         LocalPlayer.Character:PivotTo(CFrame.new(465, 16, 491))
     end
 end)
 
-CreateButton(PageTeleport, "Ponte (Bridge)", function() 
+CreateButton(PageTeleport, "Ponte", function() 
     if LocalPlayer.Character then
         LocalPlayer.Character:PivotTo(CFrame.new(103, 4, 802))
     end
 end)
 
-CreateButton(PageTeleport, "Farol 1 (Snow)", function() 
+CreateButton(PageTeleport, "Farol 1", function() 
     if LocalPlayer.Character then
         LocalPlayer.Character:PivotTo(CFrame.new(113, 82, 292))
     end
 end)
 
-CreateButton(PageTeleport, "Farol 2 (Lighthouse)", function() 
+CreateButton(PageTeleport, "Farol 2", function() 
     if LocalPlayer.Character then
         LocalPlayer.Character:PivotTo(CFrame.new(-277, 81, -240))
     end
 end)
 
-CreateButton(PageTeleport, "Casinha Biscoito", function() 
+CreateButton(PageTeleport, "Casinha de Biscoito", function() 
     if LocalPlayer.Character then
         LocalPlayer.Character:PivotTo(CFrame.new(100, 2, 377))
     end
 end)
 
-CreateButton(PageTeleport, "Céu (Sky)", function() 
+CreateButton(PageTeleport, "Céu", function() 
     if LocalPlayer.Character then 
         LocalPlayer.Character:PivotTo(CFrame.new(0, 500, 0)) 
     end 
@@ -814,7 +814,7 @@ CreateInput(PageTroll, "Player...", function(text)
     trollTarget = text
 end)
 
-CreateToggle(PageTroll, "Grudar (Stick)", function(val)
+CreateToggle(PageTroll, "Grudar", function(val)
     getgenv().Settings.StickTarget = val
     if val then
         task.spawn(function()
@@ -839,7 +839,7 @@ CreateToggle(PageTroll, "Grudar (Stick)", function(val)
     end
 end, false)
 
-CreateToggle(PageTroll, "Assistir (Spectate)", function(val)
+CreateToggle(PageTroll, "Assistir", function(val)
     getgenv().Settings.SpectateTarget = val
     if val then
         task.spawn(function()
@@ -881,7 +881,7 @@ local originalLighting = {
 
 local disabledEffects = {}
 
-CreateToggle(PageGraphics, "Fullbright (Luz Infinita)", function(val)
+CreateToggle(PageGraphics, "+Luz e -Sombra", function(val)
     getgenv().Settings.Fullbright = val
     if val then
         originalLighting.Brightness = Lighting.Brightness
@@ -909,7 +909,7 @@ CreateToggle(PageGraphics, "Fullbright (Luz Infinita)", function(val)
     end
 end, false)
 
-CreateToggle(PageGraphics, "Remover Blur/Efeitos", function(val)
+CreateToggle(PageGraphics, "Remover Blur", function(val)
     getgenv().Settings.NoBlur = val
     if val then
         for _, v in pairs(Lighting:GetChildren()) do
@@ -928,14 +928,14 @@ CreateToggle(PageGraphics, "Remover Blur/Efeitos", function(val)
     end
 end, false)
 
-CreateSlider(PageGraphics, "Horário (Hora)", 0, 24, 14, function(val)
+CreateSlider(PageGraphics, "Horário", 0, 24, 14, function(val)
     Lighting.ClockTime = val
 end)
 
 local PageSettings = CreatePage("PageSettings")
 CreateTabBtn("Configurações", PageSettings)
 
-CreateToggle(PageSettings, "Anti-AFK (No Kick)", function(val)
+CreateToggle(PageSettings, "Anti-AFK", function(val)
     getgenv().Settings.AntiAFK = val
     if val then
         local VirtualUser = game:GetService("VirtualUser")
@@ -960,7 +960,7 @@ CreateButton(PageSettings, "Carregar Config", function()
     LoadConfig()
 end)
 
-CreateButton(PageSettings, "Rejoin Server (Reentrar)", function()
+CreateButton(PageSettings, "Reentrar no Server", function()
     TeleportService:Teleport(game.PlaceId, LocalPlayer)
 end)
 
